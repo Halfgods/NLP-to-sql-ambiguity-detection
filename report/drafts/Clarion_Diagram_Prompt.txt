@@ -1,0 +1,49 @@
+DETAILED DIAGRAM BRIEF — CLARION SYSTEM ARCHITECTURE
+
+Purpose
+Create a technically accurate, publication-style architecture diagram for a two-page A4 academic project report. The diagram must explain Clarion's actual prototype architecture, not an imagined future product. It should be readable at approximately 17 cm wide in print.
+
+Canvas and visual language
+- Landscape composition, white background, clean vector/flat technical infographic.
+- Academic systems-paper aesthetic: precise alignment, restrained navy and medium blue, pale blue node fills, muted teal for data/storage, muted amber for write operations.
+- Use a consistent sans-serif font, compact but legible labels, thin dark outlines, rounded rectangles with small corner radii.
+- No 3D effects, gradients, shadows, decorative illustrations, mascots, or unnecessary icons.
+- Solid arrows indicate request/control flow; teal arrows indicate database/data flow; dashed amber arrows indicate clarification or confirmation feedback.
+- Keep all connectors orthogonal or straight; avoid crossing lines. Maintain generous spacing and clear arrowheads.
+
+Top runtime row (left to right)
+1. User / React 19 SPA — "React 19 chat UI"; secondary line: "Natural-language requests / uploads".
+2. Vite middleware API — "Upload, registry, dataset and health endpoints".
+3. Python worker — "Long-lived Python worker"; secondary line: "JSON-lines bridge; model_worker.py -> pipeline.py".
+4. Local model runtime — "llama-server + Qwen2.5-Coder-1.5B GGUF (Q4_K_M)".
+Connect these in order with solid arrows. Show a response arrow from the model runtime back to the Python worker.
+
+Request routing row
+A horizontal routing line from the Python worker feeds three separate cards:
+A. Metadata / schema path (neutral gray)
+   - db_introspect inspects tables and columns.
+   - Returns schema information directly; no SQL generation.
+B. Read / ambiguity path (pale blue)
+   - analyze_question: MiniLM + Logistic Regression signal and Qwen JSON analyst.
+   - answer_question: schema retrieval -> SQL GGUF -> regex validation.
+   - Read-only SQLite execution, with one retry.
+   - Ambiguous intent can return a clarification to the UI.
+C. Explicit write path (pale amber)
+   - propose_write creates a proposed mutation.
+   - Rollback preview + confirmation token.
+   - User confirms or cancels before workspace mutation.
+
+Shared data plane
+Place a wide teal-tinted SQLite workspace block below the three paths:
+- Main label: "Shared SQLite workspace: UI/uploads/clarion.db"
+- Secondary label: "Registry: registry.json"
+- Detail: "Seed data: people.db, academics.db; CSV / TSV / JSON uploads become tables"
+Connect metadata inspection, read execution, and write mutation to this shared workspace.
+
+Legend and accuracy constraints
+- Navy arrows = control flow; teal arrows = database flow; dashed amber arrows = response / clarification / confirmation feedback.
+- Do not invent API names, model sizes, accuracy percentages, latency values, benchmark results, or security guarantees.
+- Do not imply that arbitrary native .db file upload or export-back-to-CSV is proven unless separately confirmed.
+- Do not show fabricated agent tools or imply SQLGlot validation is already implemented; the audited implementation currently uses regex validation.
+- Add the title "Clarion system architecture" and a caption that this depicts the current prototype runtime.
+- Preserve enough internal whitespace that labels remain readable when printed at A4 size.

@@ -1,0 +1,122 @@
+# ---------------------------------------------------------------------------
+# OS / editor noise
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ---------------------------------------------------------------------------
+# Node / React UI
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+.eslintcache
+.prettiercache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------------------------------------------------------------------------
+# Secrets and credentials — never commit these
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+.netrc
+.git-credentials
+.aws/
+.ssh/
+.gnupg/
+credentials.json
+secrets.json
+service-account*.json
+client_secret*.json
+.streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------
+# Large model weights and training artifacts
+# ---------------------------------------------------------------------------
+/models/*
+!/models/README.md
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.h5
+adapters/
+runs/
+llama.cpp/
+wandb/
+mlruns/
+.cache/
+
+# ---------------------------------------------------------------------------
+# Local data, databases and runtime files
+# ---------------------------------------------------------------------------
+students.db
+*.db-wal
+*.db-shm
+data/raw/
+data/*.jsonl
+UI/uploads/*
+!UI/uploads/.gitkeep
+evals/tmp/*.db
+*.ontology.json
+*.log
+logs/
+nohup.out
+*.pid
+.ui_smoke_ok
+
+# ---------------------------------------------------------------------------
+# Generated evaluation output
+# ---------------------------------------------------------------------------
+evaluation_results/
+
+# ---------------------------------------------------------------------------
+# Personal report copies
+# Project_Report.html/pdf contain team names and roll numbers.
+# Keep them local; commit the sanitised version instead if one is created.
+# ---------------------------------------------------------------------------
+/report/Project_Report.html
+/report/Project_Report.pdf

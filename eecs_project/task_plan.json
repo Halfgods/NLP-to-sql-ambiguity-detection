@@ -1,0 +1,82 @@
+{
+  "project": "Ambiguity-Aware NL-to-SQL (Clarion rebuild, Qwen2.5-Coder-1.5B Q4_K_M + hybrid detector)",
+  "acceptance_target": {
+    "metric": "held-out end-to-end + detection accuracy",
+    "bar": ">= 0.80 classifier accuracy and >= 0.75 execution accuracy on domain DB; measured, not promised",
+    "eval_set": "evals/heldout/*.jsonl, >= 100 question--schema pairs across >= 4 schemas, ~33 CLEAR / ~34 AMBIGUOUS / ~33 UNDERSPECIFIED, schemas not used in training"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "owner": "me",
+      "title": "QLoRA fine-tune Qwen2.5-Coder-1.5B-Instruct on 5k SQL teacher pairs",
+      "status": "running (GPU, background shell sh_18921e8f4001uG62ZhtIrFmuST, ~21 min ETA: measured 2.0 s/step x 626 steps)",
+      "deliverables": ["adapters/qwen25c-1.5b-sql-lora/", "scripts/train_qlora.py"],
+      "runs_on": "GPU - exclusive, do not colocate",
+      "dependencies": []
+    },
+    {
+      "id": "T2",
+      "owner": "me",
+      "title": "Merge LoRA -> GGUF F16 -> llama-quantize Q4_K_M (~941 MB) -> serve via llama-server (~1.06 GB RSS)",
+      "status": "queued behind T1",
+      "deliverables": ["models/qwen25-coder-1.5b-sql-q4_k_m.gguf", "scripts/merge_lora.py", "scripts/build_gguf.sh", "scripts/serve_sql.sh"],
+      "dependencies": ["T1"]
+    },
+    {
+      "id": "T3",
+      "owner": "agent:classifier",
+      "title": "Schema-aware 3-class ambiguity classifier (CLEAR / AMBIGUOUS / UNDERSPECIFIED): synthetic multi-schema dataset, MiniLM embeddings + LogisticRegression, threshold tuning on validation, held-out schema split",
+      "status": "pending",
+      "deliverables": [
+        "ambiguity/classifier.py  (predict(question, schema_text) -> {label, probs})",
+        "ambiguity/generate_data.py (>= 900 labeled question--schema pairs across >= 5 synthetic schemas)",
+        "ambiguity/artifacts/classifier.pkl + encoder + thresholds.json",
+        "ambiguity/SELF_EVAL.md (train/val/test confusion matrix, macro-F1, ambiguity recall, unseen-schema slice)"
+      ],
+      "runs_on": "CPU only - never start GPU training or llama-server",
+      "dependencies": []
+    },
+    {
+      "id": "T4",
+      "owner": "agent:schema-ambiguity",
+      "title": "Dynamic SQLite introspection + SLM ambiguity analysis/clarify module (structured JSON, no hardcoded schema rules, no trust in SLM self-confidence)",
+      "reunner_notes": "write-only contract against model_runtime stubs; unit tests with a fake client",
+      "deliverables": [
+        "db_introspect.py (tables, columns, types, PK/FK, sample values, relationship graph, relevance selection)",
+        "ambiguity/analysis.py (combine classifier evidence + SLM verdict; build clarification options; 3 labels)",
+        "tests/test_ambiguity.py (stub-runtime unit tests, all green)"
+      ],
+      "runs_on": "CPU only, no model server",
+      "dependencies": []
+    },
+    {
+      "id": "T5",
+      "owner": "agent:model-tester",
+      "title": "Brutal tester: author held-out eval suite (manually labeled, >= 4 schemas incl. schemas neither classifier nor SQL trainer saw) and write scripts/eval_full.py measuring classifier accuracy/macro-F1/ambiguity recall, clarification quality, SQL execution accuracy, invalid-SQL rate; generate a brutal feedback report (no sugar-coating)",
+      "status": "pending",
+      "deliverables": [
+        "evals/heldout/classifier_eval.jsonl (>= 100 pairs, 3 labels)",
+        "evals/heldout/sql_eval.jsonl (>= 25 domain pairs for students.db execution accuracy)",
+        "scripts/eval_full.py (runs when artifacts exist, graceful MISSING skips)",
+        "evals/BRUTAL_FEEDBACK.md template + generator (brutal, numbers-backed)"
+      ],
+      "runs_on": "CPU only until told otherwise",
+      "dependencies": []
+    },
+    {
+      "id": "T6",
+      "owner": "me",
+      "title": "Integration: wire classifier + SLM ambiguity + clarification chips into UI worker; smoke-test the React UI end-to-end with chrome-devtools",
+      "dependencies": ["T2", "T3", "T4"]
+    },
+    {
+      "id": "T7",
+      "owner": "me + agent:model-tester",
+      "title": "Run full held-out evaluation, verify target bar, publish brutal report with brutal suggestions",
+      "dependencies": ["T6", "T5"]
+    }
+  ],
+  "parallel_wave_1": ["T3", "T4", "T5"],
+  "sequential_spine": ["T1", "T2", "T6", "T7"]
+}

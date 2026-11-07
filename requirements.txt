@@ -1,0 +1,7 @@
+# Runtime dependencies for the UI worker and pipeline.
+# Install CPU torch first so pip does not pull the large CUDA build:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch
+numpy==2.5.4
+scikit-learn==1.9.1
+sentence-transformers==6.2.0
+sqlglot==30.24.0

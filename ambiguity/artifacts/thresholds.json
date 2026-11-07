@@ -1,0 +1,12 @@
+{
+  "biases": {
+    "CLEAR": 0.04999999999999993,
+    "AMBIGUOUS": -5.551115123125783e-17,
+    "UNDERSPECIFIED": -0.10000000000000003
+  },
+  "prediction_rule": "argmax_c (p_c + bias_c)",
+  "tuned_on": "val split",
+  "val_macro_f1_before_thresholds": 0.742,
+  "val_macro_f1_after_thresholds": 0.762,
+  "best_C": 1.0
+}

@@ -1,0 +1,236 @@
+{
+  "generated_at": "2026-11-06 12:19:52 IST",
+  "sql_protocol": "evals/heldout/sql_eval.jsonl; production schema builder and SQL prompt; projection+2dp plus strict 4dp result comparison; invalid/missing SQL and non-matching results count as incorrect",
+  "ambiguity_protocol": "evals/heldout/classifier_eval.jsonl; same 101 pairs/schema text for all three methods; Qwen Q4_K_M, JSON verdict max_tokens=260, temperature=0; invalid JSON is a missing prediction and counts as incorrect",
+  "sql_models": [
+    {
+      "name": "Qwen SQL-only Q4_K_M",
+      "checkpoint": "qwen25-coder-1.5b-sql-q4_k_m.gguf",
+      "size_bytes": 986048160,
+      "status": "run",
+      "n_evaluated": 101,
+      "exec_accuracy": 0.8119,
+      "exec_accuracy_strict": 0.6931
+    },
+    {
+      "name": "Qwen SQL+write F16",
+      "checkpoint": "qwen25-coder-1.5b-sql-write-f16.gguf",
+      "size_bytes": 3093669024,
+      "status": "run",
+      "n_evaluated": 101,
+      "exec_accuracy": 0.7822,
+      "exec_accuracy_strict": 0.6535
+    },
+    {
+      "name": "Qwen SQL+write Q4_K_M (current)",
+      "checkpoint": "qwen25-coder-1.5b-sql-write-q4_k_m.gguf",
+      "size_bytes": 986048160,
+      "status": "run",
+      "n_evaluated": 101,
+      "exec_accuracy": 0.7921,
+      "exec_accuracy_strict": 0.6634
+    }
+  ],
+  "ambiguity": {
+    "n": 101,
+    "labels": [
+      "CLEAR",
+      "AMBIGUOUS",
+      "UNDERSPECIFIED"
+    ],
+    "methods": [
+      {
+        "name": "MiniLM-L6-v2 + Logistic Regression",
+        "metrics": {
+          "accuracy": 0.604,
+          "macro_f1": 0.606,
+          "per_class": {
+            "CLEAR": {
+              "precision": 0.4783,
+              "recall": 0.6667,
+              "f1": 0.557,
+              "support": 33
+            },
+            "AMBIGUOUS": {
+              "precision": 0.8421,
+              "recall": 0.4706,
+              "f1": 0.6038,
+              "support": 34
+            },
+            "UNDERSPECIFIED": {
+              "precision": 0.6389,
+              "recall": 0.6765,
+              "f1": 0.6571,
+              "support": 34
+            }
+          },
+          "ambiguity": {
+            "precision": 0.8421,
+            "recall": 0.4706,
+            "f1": 0.6038
+          },
+          "confusion_matrix": {
+            "columns_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED"
+            ],
+            "rows_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED"
+            ],
+            "matrix": [
+              [
+                22,
+                3,
+                8
+              ],
+              [
+                13,
+                16,
+                5
+              ],
+              [
+                11,
+                0,
+                23
+              ]
+            ]
+          }
+        }
+      },
+      {
+        "name": "Qwen SLM analyst only",
+        "metrics": {
+          "accuracy": 0.297,
+          "macro_f1": 0.1653,
+          "per_class": {
+            "CLEAR": {
+              "precision": 0.3409,
+              "recall": 0.9091,
+              "f1": 0.4959,
+              "support": 33
+            },
+            "AMBIGUOUS": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 34
+            },
+            "UNDERSPECIFIED": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 34
+            }
+          },
+          "ambiguity": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "confusion_matrix": {
+            "columns_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED",
+              "INVALID"
+            ],
+            "rows_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED"
+            ],
+            "matrix": [
+              [
+                30,
+                0,
+                0,
+                3
+              ],
+              [
+                31,
+                0,
+                0,
+                3
+              ],
+              [
+                27,
+                0,
+                0,
+                7
+              ]
+            ]
+          }
+        },
+        "invalid_json": 13,
+        "mean_latency_s": 5.26,
+        "valid_json_count": 88,
+        "invalid_json_rate": 0.1287
+      },
+      {
+        "name": "Clarion hybrid (MiniLM + Qwen)",
+        "metrics": {
+          "accuracy": 0.6436,
+          "macro_f1": 0.6365,
+          "per_class": {
+            "CLEAR": {
+              "precision": 0.5079,
+              "recall": 0.9697,
+              "f1": 0.6667,
+              "support": 33
+            },
+            "AMBIGUOUS": {
+              "precision": 0.9375,
+              "recall": 0.4412,
+              "f1": 0.6,
+              "support": 34
+            },
+            "UNDERSPECIFIED": {
+              "precision": 0.8182,
+              "recall": 0.5294,
+              "f1": 0.6429,
+              "support": 34
+            }
+          },
+          "ambiguity": {
+            "precision": 0.9375,
+            "recall": 0.4412,
+            "f1": 0.6
+          },
+          "confusion_matrix": {
+            "columns_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED"
+            ],
+            "rows_are": [
+              "CLEAR",
+              "AMBIGUOUS",
+              "UNDERSPECIFIED"
+            ],
+            "matrix": [
+              [
+                32,
+                1,
+                0
+              ],
+              [
+                15,
+                15,
+                4
+              ],
+              [
+                16,
+                0,
+                18
+              ]
+            ]
+          }
+        },
+        "mean_slm_latency_s": 5.26
+      }
+    ]
+  }
+}
